@@ -1,60 +1,39 @@
 pipeline {
-
     agent any
-
-    environment {
-        IMAGE_NAME = "demo-app"
-        TAG = "v1"
-        CONTAINER_NAME = "demo"
-    }
 
     stages {
 
-        stage('Clone Code') {
+        stage('Checkout') {
             steps {
                 git 'https://github.com/Sapana04/jenkins-cicd-project.git'
             }
         }
 
         stage('Build Docker Image') {
-            steps {  
-                sh 'docker build -t $IMAGE_NAME:$TAG .'
+            steps {
+                sh 'docker build -t demo-app:v1 .'
             }
         }
 
         stage('Stop Old Container') {
             steps {
-                sh 'docker stop $CONTAINER_NAME || true'
-                sh 'docker rm $CONTAINER_NAME || true'
+                sh 'docker rm -f demo || true'
             }
         }
 
-        stage('Run New Container') {
+        stage('Run Container') {
             steps {
-                sh '''
-                docker run -d \
-                --name $CONTAINER_NAME \
-                -p 5000:5000 \
-                $IMAGE_NAME:$TAG
-                '''
-            }
-        }
-
-        stage('Verify Container') {
-            steps {
-                sh 'docker ps'
+                sh 'docker run -d --name demo -p 5000:5000 demo-app:v1'
             }
         }
     }
 
     post {
-
         success {
-            echo 'CI/CD Pipeline Successfully Executed 🚀'
+            echo "Deployment Successful 🚀"
         }
-
         failure {
-            echo 'Pipeline Failed ❌'
+            echo "Deployment Failed ❌"
         }
     }
 }
