@@ -18,6 +18,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
+                echo "Webhook Trigger Test"  
                 sh 'docker build -t $IMAGE_NAME:$TAG .'
             }
         }
